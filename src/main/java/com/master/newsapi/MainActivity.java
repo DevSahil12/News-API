@@ -3,6 +3,7 @@ package com.master.newsapi;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
@@ -52,7 +53,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        toggle = new ActionBarDrawerToggle(this, drawerLayout, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        toggle = new ActionBarDrawerToggle(this, drawerLayout
+                , R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawerLayout.addDrawerListener(toggle);
         toggle.syncState();
 
@@ -61,7 +63,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         recyclerView = findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-       newsAdapter=new NewsAdapter(new ArrayList<>());
+        newsAdapter = new NewsAdapter(new ArrayList<>());
         recyclerView.setAdapter(newsAdapter);
 
         if (!sessionManager.isLoggedIn()) {
@@ -116,11 +118,39 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         startActivity(intent);
     }
 
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.drawer_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if (id == R.id.nav_profile) {
+            Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
+            startActivity(intent);
+        } else if (id == R.id.nav_settings) {
+            Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
+            startActivity(intent);
+        } else if (id == R.id.nav_logout) {
+            sessionManager.setLogin(false, null);
+            navigateToLogin();
+        }
+            return super.onOptionsItemSelected(item);
+
+
+    }
+
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         int id = item.getItemId();
         if (id == R.id.nav_profile) {
             Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
+            startActivity(intent);
+        } else if (id == R.id.nav_settings) {
+            Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
             startActivity(intent);
         } else if (id == R.id.nav_logout) {
             sessionManager.setLogin(false, null);
