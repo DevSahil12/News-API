@@ -25,7 +25,11 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.NewsViewHolder
     }
 
     public void setOnItemClickListener(OnItemClickListener listener) {
-        this.listener = listener; // Correct assignment
+        this.listener = listener;
+    }
+    public void setNewsList(List<Article> newsList) {
+        this.articles = newsList;
+        notifyDataSetChanged();
     }
 
     @NonNull
