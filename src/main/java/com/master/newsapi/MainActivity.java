@@ -22,6 +22,8 @@ import com.master.newsapi.LoginActivities.Login;
 import com.master.newsapi.LoginActivities.SessionManager;
 import com.master.newsapi.Retrofit.ApiClient;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
 import retrofit2.Call;
@@ -30,7 +32,8 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+public class MainActivity extends AppCompatActivity
+        implements NavigationView.OnNavigationItemSelectedListener  {
 
     private static final String API_KEY = "846a2356e7254f38a6cd07bc8af86226";
     private RecyclerView recyclerView;
@@ -81,8 +84,22 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         NewsApiService newsApiService = retrofit.create(NewsApiService.class);
 
+        // Calculate the date one month ago from today
+        LocalDate currentDate = null;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            currentDate = LocalDate.now();
+        }
+        LocalDate oneMonthAgoDate = null;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            oneMonthAgoDate = currentDate.minusMonths(1);
+        }
+        String fromDate = null;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            fromDate = oneMonthAgoDate.format(DateTimeFormatter.ISO_LOCAL_DATE);
+        }
+
         String query = "tesla";
-        String fromDate = "2024-05-11";
+
         String sortBy = "publishedAt";
         int page = 5;
 
@@ -90,7 +107,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         call.enqueue(new Callback<NewsResponse>() {
             @Override
             public void onResponse(Call<NewsResponse> call, Response<NewsResponse> response) {
+                Log.d("fetchNews", "Response received");
                 if (response.isSuccessful() && response.body() != null) {
+                    Log.d("fetchNews", "Response is successful");
                     newsAdapter.setNewsList(response.body().getArticles());
                     newsAdapter.setOnItemClickListener(new NewsAdapter.OnItemClickListener() {
                         @Override
@@ -99,15 +118,17 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         }
                     });
                 } else {
-                    // Handle the error response here
+                    // Log the response code and message for debugging
+                    Log.e("fetchNews", "Response not successful: " + response.code() + " " + response.message());
                     Toast.makeText(MainActivity.this, "Failed to fetch news", Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
             public void onFailure(Call<NewsResponse> call, Throwable t) {
-                // Handle the failure here
-                Toast.makeText(MainActivity.this, "An error occurred", Toast.LENGTH_SHORT).show();
+                // Log the failure message for debugging
+                Log.e("fetchNews", "API call failed: " + t.getMessage());
+                Toast.makeText(MainActivity.this, "An error occurred: " + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -131,16 +152,17 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if (id == R.id.nav_profile) {
             Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
             startActivity(intent);
+            return true;
         } else if (id == R.id.nav_settings) {
             Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
             startActivity(intent);
+            return true;
         } else if (id == R.id.nav_logout) {
             sessionManager.setLogin(false, null);
             navigateToLogin();
+            return true;
         }
-            return super.onOptionsItemSelected(item);
-
-
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
