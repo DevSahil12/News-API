@@ -19,6 +19,17 @@
             android:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
 
 
+
+
+        <Spinner
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="220dp"
+            android:layout_marginTop="20sp"
+            android:id="@+id/Category"
+
+            />
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerView"
             android:layout_width="match_parent"
