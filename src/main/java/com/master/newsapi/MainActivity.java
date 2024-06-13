@@ -5,6 +5,10 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -33,14 +37,12 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener  {
+        implements NavigationView.OnNavigationItemSelectedListener {
 
     private static final String API_KEY = "846a2356e7254f38a6cd07bc8af86226";
-    private RecyclerView recyclerView;
     private NewsAdapter newsAdapter;
-
+    private Spinner category;
     private DrawerLayout drawerLayout;
-    private NavigationView navigationView;
     private ActionBarDrawerToggle toggle;
     private SessionManager sessionManager;
 
@@ -49,11 +51,30 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        category = findViewById(R.id.Category);
+
+        ArrayAdapter<CharSequence> categoryAdapter = ArrayAdapter.createFromResource(
+                this, R.array.query_array, android.R.layout.simple_spinner_item);
+        categoryAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        category.setAdapter(categoryAdapter);
+
+        category.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
+                fetchNews(category.getSelectedItem().toString().toLowerCase());
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parentView) {
+                // Do nothing here
+            }
+        });
+
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         drawerLayout = findViewById(R.id.drawer_layout);
-        navigationView = findViewById(R.id.nav_view);
+        NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
         toggle = new ActionBarDrawerToggle(this, drawerLayout
@@ -63,7 +84,7 @@ public class MainActivity extends AppCompatActivity
 
         sessionManager = new SessionManager(this);
 
-        recyclerView = findViewById(R.id.recyclerView);
+        RecyclerView recyclerView = findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         newsAdapter = new NewsAdapter(new ArrayList<>());
@@ -73,10 +94,11 @@ public class MainActivity extends AppCompatActivity
             navigateToLogin();
         }
 
-        fetchNews();
+        // Initially fetch news for the default selected category
+        fetchNews(category.getSelectedItem().toString().toLowerCase());
     }
 
-    private void fetchNews() {
+    private void fetchNews(String selectedCategory) {
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl("https://newsapi.org/")
                 .addConverterFactory(GsonConverterFactory.create())
@@ -84,7 +106,6 @@ public class MainActivity extends AppCompatActivity
 
         NewsApiService newsApiService = retrofit.create(NewsApiService.class);
 
-        // Calculate the date one month ago from today
         LocalDate currentDate = null;
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
             currentDate = LocalDate.now();
@@ -98,12 +119,10 @@ public class MainActivity extends AppCompatActivity
             fromDate = oneMonthAgoDate.format(DateTimeFormatter.ISO_LOCAL_DATE);
         }
 
-        String query = "tesla";
-
         String sortBy = "publishedAt";
         int page = 5;
 
-        Call<NewsResponse> call = newsApiService.getEverything(query, fromDate, sortBy, API_KEY, page);
+        Call<NewsResponse> call = newsApiService.getEverything(selectedCategory, fromDate, sortBy, API_KEY, page);
         call.enqueue(new Callback<NewsResponse>() {
             @Override
             public void onResponse(Call<NewsResponse> call, Response<NewsResponse> response) {
@@ -111,14 +130,8 @@ public class MainActivity extends AppCompatActivity
                 if (response.isSuccessful() && response.body() != null) {
                     Log.d("fetchNews", "Response is successful");
                     newsAdapter.setNewsList(response.body().getArticles());
-                    newsAdapter.setOnItemClickListener(new NewsAdapter.OnItemClickListener() {
-                        @Override
-                        public void onItemClick(Article article) {
-                            openNewsDetails(article.getUrl());
-                        }
-                    });
+                    newsAdapter.setOnItemClickListener(article -> openNewsDetails(article.getUrl()));
                 } else {
-                    // Log the response code and message for debugging
                     Log.e("fetchNews", "Response not successful: " + response.code() + " " + response.message());
                     Toast.makeText(MainActivity.this, "Failed to fetch news", Toast.LENGTH_SHORT).show();
                 }
@@ -126,7 +139,6 @@ public class MainActivity extends AppCompatActivity
 
             @Override
             public void onFailure(Call<NewsResponse> call, Throwable t) {
-                // Log the failure message for debugging
                 Log.e("fetchNews", "API call failed: " + t.getMessage());
                 Toast.makeText(MainActivity.this, "An error occurred: " + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
@@ -138,7 +150,6 @@ public class MainActivity extends AppCompatActivity
         intent.putExtra("url", url);
         startActivity(intent);
     }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -192,7 +203,8 @@ public class MainActivity extends AppCompatActivity
     public void onBackPressed() {
         if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
             drawerLayout.closeDrawer(GravityCompat.START);
-        } else
+        } else {
             super.onBackPressed();
+        }
     }
 }
