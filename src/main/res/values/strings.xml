@@ -2,4 +2,12 @@
     <string name="app_name">NewsApi</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>"
+
+    <string-array name="query_array">
+        <item>bitcoin</item>
+        <item>tesla</item>
+        <item>apple</item>
+        <item>google</item>
+        <item>stock market</item>
+    </string-array>
 </resources>
