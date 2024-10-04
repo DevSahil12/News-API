@@ -39,7 +39,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
-    private static final String API_KEY = "846a2356e7254f38a6cd07bc8af86226";
+    private static final String API_KEY = "Enter your API KEY";
     private NewsAdapter newsAdapter;
     private Spinner category;
     private DrawerLayout drawerLayout;
