@@ -3,12 +3,9 @@
     android:id="@+id/drawer_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-
-    <!-- Main content -->
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
@@ -17,27 +14,19 @@
             app:menu="@menu/drawer_menu"
             android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
             android:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
-
-
-
-
         <Spinner
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="220dp"
             android:layout_marginTop="20sp"
             android:id="@+id/Category"
-
             />
-
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_below="@id/toolbar"/>
     </RelativeLayout>
-
-    <!-- Navigation drawer -->
     <com.google.android.material.navigation.NavigationView
         android:id="@+id/nav_view"
         android:layout_width="wrap_content"
