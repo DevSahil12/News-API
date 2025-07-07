@@ -13,5 +13,6 @@ public interface NewsApiService {
             @Query("sortBy") String sortBy,
             @Query("apiKey") String apiKey,
             @Query("page") int page
+        
     );
 }
