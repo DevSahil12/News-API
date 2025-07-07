@@ -7,15 +7,11 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import androidx.appcompat.app.AppCompatActivity;
-
 import com.master.newsapi.DataBase.User;
 import com.master.newsapi.DataBase.UserDAO;
 import com.master.newsapi.MainActivity;
 import com.master.newsapi.R;
-
-
 import org.mindrot.jbcrypt.BCrypt;
 
 public class Login extends AppCompatActivity {
@@ -34,7 +30,6 @@ public class Login extends AppCompatActivity {
         if (sessionManager.isLoggedIn()) {
             navigateToMainActivity();
         }
-
         username = findViewById(R.id.username);
         password = findViewById(R.id.password);
         login = findViewById(R.id.button);
@@ -49,7 +44,6 @@ public class Login extends AppCompatActivity {
         });
 
         userDAO = new UserDAO(this);
-
         login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -57,7 +51,6 @@ public class Login extends AppCompatActivity {
             }
         });
     }
-
     public void loginUser() {
         String email = username.getText().toString().trim();
         String Password = password.getText().toString().trim();
@@ -74,17 +67,14 @@ public class Login extends AppCompatActivity {
             Toast.makeText(this, "Invalid email or password", Toast.LENGTH_SHORT).show();
         }
     }
-
     private void navigateToMainActivity() {
         Intent intent = new Intent(Login.this, MainActivity.class);
         startActivity(intent);
         finish();
     }
-
     @Override
     protected void onDestroy() {
         userDAO.close();
         super.onDestroy();
     }
 }
-
